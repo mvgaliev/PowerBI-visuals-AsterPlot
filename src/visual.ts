@@ -177,12 +177,12 @@ module powerbi.extensibility.visual {
 
             this.slicesElement = this.mainGroupElement
                 .append("g")
-                .classed(AsterPlot.AsterSlices.class, true);
+                .classed(AsterPlot.AsterSlices.className, true);
 
             this.interactivityService = createInteractivityService(options.host);
 
             this.legend = createLegend(
-                $(options.element),
+                options.element,
                 options.host && false,
                 this.interactivityService,
                 true);
@@ -261,7 +261,7 @@ module powerbi.extensibility.visual {
 
                     currentValue += <number>categorical.Y[1].values[i];
                 }
-
+debugger
                 let identity: DataViewScopeIdentity = categorical.Category.identity[i],
                     color: string,
                     sliceWidth: number;
@@ -416,12 +416,12 @@ module powerbi.extensibility.visual {
             if (this.data.hasHighlights) {
                 this.renderArcsAndLabels(AsterPlot.AnimationDuration, true);
             } else {
-                this.slicesElement.selectAll(AsterPlot.AsterHighlightedSlice.selector).remove();
+                this.slicesElement.selectAll(AsterPlot.AsterHighlightedSlice.selectorName).remove();
             }
 
             if (this.interactivityService) {
                 let behaviorOptions: AsterPlotBehaviorOptions = {
-                    selection: this.slicesElement.selectAll(AsterPlot.AsterSlice.selector + ", " + AsterPlot.AsterHighlightedSlice.selector),
+                    selection: this.slicesElement.selectAll(AsterPlot.AsterSlice.selectorName + ", " + AsterPlot.AsterHighlightedSlice.selectorName),
                     clearCatcher: this.clearCatcher,
                     interactivityService: this.interactivityService,
                     hasHighlights: this.data.hasHighlights
@@ -484,7 +484,7 @@ module powerbi.extensibility.visual {
                 : AsterPlot.AsterSlice;
 
             let selection = this.slicesElement
-                .selectAll(classSelector.selector)
+                .selectAll(classSelector.selectorName)
                 .data(
                 arcDescriptorDataPoints,
                 (d: ArcDescriptor<AsterDataPoint>, i: number) => {
@@ -496,7 +496,7 @@ module powerbi.extensibility.visual {
             selection
                 .enter()
                 .append("path")
-                .classed(classSelector.class, true)
+                .classed(classSelector.className, true)
                 .attr("stroke", "#333");
 
             selection
@@ -624,11 +624,11 @@ module powerbi.extensibility.visual {
             }
 
             // Draw labels
-            if (context.select(AsterPlot.labelGraphicsContextClass.selector).empty())
-                context.append("g").classed(AsterPlot.labelGraphicsContextClass.class, true);
+            if (context.select(AsterPlot.labelGraphicsContextClass.selectorName).empty())
+                context.append("g").classed(AsterPlot.labelGraphicsContextClass.className, true);
 
             let labels = context
-                .select(AsterPlot.labelGraphicsContextClass.selector)
+                .select(AsterPlot.labelGraphicsContextClass.selectorName)
                 .selectAll(".data-labels").data<LabelEnabledDataPoint>(
                 filteredData,
                 (d: ArcDescriptor<AsterDataPoint>) => (d.data.identity as ISelectionId).getKey());
@@ -648,14 +648,14 @@ module powerbi.extensibility.visual {
                 .remove();
 
             // Draw lines
-            if (context.select(AsterPlot.linesGraphicsContextClass.selector).empty())
-                context.append("g").classed(AsterPlot.linesGraphicsContextClass.class, true);
+            if (context.select(AsterPlot.linesGraphicsContextClass.selectorName).empty())
+                context.append("g").classed(AsterPlot.linesGraphicsContextClass.className, true);
 
             // Remove lines for null and zero values
             filteredData = _.filter(filteredData, (d: ArcDescriptor<AsterDataPoint>) => d.data.sliceHeight !== null && d.data.sliceHeight !== 0);
 
             let lines = context
-                .select(AsterPlot.linesGraphicsContextClass.selector)
+                .select(AsterPlot.linesGraphicsContextClass.selectorName)
                 .selectAll("polyline")
                 .data<LabelEnabledDataPoint>(
                 filteredData,
@@ -741,7 +741,7 @@ module powerbi.extensibility.visual {
                 .outerRadius(radius);
             if (this.settings.outerLine.show) {
                 let OuterThickness: string = this.settings.outerLine.thickness + "px";
-                let outerLine = mainGroup.selectAll(AsterPlot.OuterLine.selector).data(data);
+                let outerLine = mainGroup.selectAll(AsterPlot.OuterLine.selectorName).data(data);
                 outerLine.enter().append("path");
                 outerLine.attr("fill", "none")
                     .attr({
@@ -750,16 +750,16 @@ module powerbi.extensibility.visual {
                         "d": outlineArc as SvgArc<any> // TODO: check it.
                     })
                     .style("opacity", 1)
-                    .classed(AsterPlot.OuterLine.class, true);
+                    .classed(AsterPlot.OuterLine.className, true);
                 outerLine.exit().remove();
             }
             else
-                mainGroup.selectAll(AsterPlot.OuterLine.selector).remove();
+                mainGroup.selectAll(AsterPlot.OuterLine.selectorName).remove();
         }
 
         private drawCenterText(innerRadius: number): void {
             if (_.isEmpty(this.data.centerText) || !this.settings.label.show) {
-                this.mainGroupElement.select(AsterPlot.CenterLabelClass.selector).remove();
+                this.mainGroupElement.select(AsterPlot.CenterLabelClass.selectorName).remove();
                 return;
             }
 
@@ -770,8 +770,8 @@ module powerbi.extensibility.visual {
                 text: this.data.centerText
             };
 
-            if (this.mainGroupElement.select(AsterPlot.CenterLabelClass.selector).empty())
-                this.centerText = this.mainGroupElement.append("text").classed(AsterPlot.CenterLabelClass.class, true);
+            if (this.mainGroupElement.select(AsterPlot.CenterLabelClass.selectorName).empty())
+                this.centerText = this.mainGroupElement.append("text").classed(AsterPlot.CenterLabelClass.className, true);
 
             this.centerText
                 .style({
@@ -789,7 +789,7 @@ module powerbi.extensibility.visual {
 
         private clear(): void {
             this.mainGroupElement.selectAll("path").remove();
-            this.mainGroupElement.select(AsterPlot.CenterLabelClass.selector).remove();
+            this.mainGroupElement.select(AsterPlot.CenterLabelClass.selectorName).remove();
             dataLabelUtils.cleanDataLabels(this.mainLabelsElement, true);
             this.legend.drawLegend({ dataPoints: [] }, this.layout.viewportCopy);
         }
